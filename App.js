@@ -5,8 +5,6 @@ import './App.css';
 
 class App extends Component {
 
-    //billsPerPage = 10;
-
   constructor(props){
     super(props);
 
@@ -14,7 +12,6 @@ class App extends Component {
       searchBill: '',
       data:[],
       showVetoedIssues: false
-      //page: 0,
     }
   }
 
@@ -30,56 +27,63 @@ class App extends Component {
   }
 
   onSearchChange = (e) => {
-    this.setState({
+      this.setState({
       searchBill: e.target.value
     }) 
   }
 
-   handleVetoedButton = () => {
-      const { showVetoedIssues } = this.state;
-      showVetoedIssues ? this.setState({showVetoedIssues: false}) : this.setState({showVetoedIssues: true})      
+  handleDynamicButton = () => {
+      const { showVetoedIssues } = this.state; 
+      this.setState({showVetoedIssues: !showVetoedIssues})
    }
 
-   handleClearButton = () => {
+  handleClearButton = () => {
      this.setState({searchBill: ''})
    }
   
   render() {
     const {searchBill, data, showVetoedIssues} = this.state;
-    const filteredSearchBill = searchBill.toUpperCase();
+    const caseSensitive = searchBill.toUpperCase();
     let filteredBillsData = data.filter(bill => {
-        return  (bill.date.includes(filteredSearchBill) 
-                || bill.measureNumber.includes(filteredSearchBill) 
-                || bill.signedOrVetoed.includes(filteredSearchBill)
-                || bill.voterSupport.includes(filteredSearchBill)
-                || bill.relatingToClause.includes(filteredSearchBill))          
+        return  (bill.date.includes(caseSensitive) 
+                || bill.measureNumber.includes(caseSensitive) 
+                || bill.signedOrVetoed.includes(caseSensitive)
+                || bill.voterSupport.includes(caseSensitive)
+                || bill.relatingToClause.includes(caseSensitive))          
     })
-    // console.log(filteredBillsData); 
-     let dynamicButton = showVetoedIssues ? "All" : "Only Vetoed";
-     if(!showVetoedIssues) {
-       let showAllVetoed = data.filter(billData => {
-          if(billData.voterSupport >= 50 && billData.signedOrVetoed === "Vetoed") {
-            return billData;
+      // console.log(filteredBillsData); 
+      let dynamicButton = showVetoedIssues ? "All" : "Only Vetoed";
+
+      if(!showVetoedIssues) {
+        let filteredSignOrVetoed = data.filter(billData => {
+            if(billData.voterSupport >= 50 && billData.signedOrVetoed === "Vetoed") {
+              return billData;
           } else {
-            return null;
+              return null;
           }           
-       });
-          filteredBillsData = showAllVetoed;
-     };
-     
-    return (
-      <div className="App">    
-        <center>
+    });
+      //console.log('filteredSignOrVetoed',filteredSignOrVetoed);    
+      let searchSignedOrVetoed =  filteredSignOrVetoed.filter(bill => {
+            return bill.measureNumber.toLowerCase().includes(searchBill.toLowerCase());
+         })
+            filteredBillsData = searchSignedOrVetoed ;   
+  }
+           
+  return (
+  <div className="App">    
+      <center>
             <h1>Search for Oregon State Legislature Bills</h1> 
       </center>
               <label>Search: </label>
-              <input type="text" value={this.state.searchBill}  onChange={this.onSearchChange} />
+              <input type="text" value={this.state.searchBill}  
+              onChange={this.onSearchChange} />
               <button onClick={this.handleClearButton}>Clear</button>           
       <div className="button" style={{textAlign: 'left'}}>
-          <button onClick={this.handleVetoedButton} className="button-left">Show {dynamicButton} Bills</button>
+              <button onClick={this.handleDynamicButton} className="button-left">
+              Show {dynamicButton} Bills</button>
       </div>          
-        <TableBills data={filteredBillsData} />
-    </div>  
+              <TableBills data={filteredBillsData} />
+  </div>  
     )
   }
 }

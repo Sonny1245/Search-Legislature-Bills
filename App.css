@@ -7,6 +7,9 @@ table tr td {
   border-collapse: separate;
   background-color: cyan;
 }
+.table-style {
+  border-collapse: collapse;
+}
 
 thead tr th {
   border: 1px solid black;
