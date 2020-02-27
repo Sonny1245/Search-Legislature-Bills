@@ -4,7 +4,7 @@ const TableBills = ({data}) => {
 
   return (
     <div className="App">
-    <table>
+    <table className="table-style">
     <thead>
       <tr>
           <th scope="col">Date</th>
